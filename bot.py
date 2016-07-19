@@ -4,6 +4,9 @@ import os
 import urllib2
 from bs4 import BeautifulSoup
 from topia.termextract import tag
+from textblob import TextBlob
+from textblob.np_extractors import ConllExtractor
+from textblob.sentiments import NaiveBayesAnalyzer
 from time import gmtime, strftime
 from wordfilter import Wordfilter
 from secrets import *
@@ -25,6 +28,7 @@ hparser = HTMLParser.HTMLParser()
 tagger = tag.Tagger()
 tagger.initialize()
 wordfilter = Wordfilter()
+extractor = ConllExtractor()
 
 
 LOFF = "Love in the Time of"
@@ -66,11 +70,21 @@ def get_news():
 def process(headline):
     text = ""
     headline = hparser.unescape(headline).strip()
-    tagged = tagger(headline)
-    for i, word in enumerate(tagged):
-        if is_candidate(word):
-            text = LOFF + " " + word[0].title()
-            print("WORD: %s" % word[0].title())
+    print("HEADLINE: %s" % headline)
+
+    blob = TextBlob(headline, analyzer=NaiveBayesAnalyzer())
+    print("Sentiment: ")
+    print(blob.sentiment)
+
+    n_phrases = blob.noun_phrases
+    print("NOUN PHRASES")
+    print(n_phrases)
+
+    for i, phrase in enumerate(n_phrases):
+        if len(phrase.split()) > 1:
+            text = LOFF + " " + phrase.title()
+            print("phrase: %s" % phrase.title())
+            print("len: %s" % len(phrase.split()))
             print("TWEET: %s" % text)
 
     if len(text) > 140:
