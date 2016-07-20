@@ -94,6 +94,7 @@ def ends_with_verb(phrase):
         if len(syns_v) >= len(syns_n):
             return True
 
+
 def is_city(phrase):
     for c in geography.us_cities["cities"]:
         if phrase.title() == c["city"]:
