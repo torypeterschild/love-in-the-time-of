@@ -176,7 +176,8 @@ def process(headline):
     print("\nCANDIDATES")
     print(candidates)
 
-    text = LOFF + " " + random.choice(candidates)
+    if candidates:
+        text = LOFF + " " + random.choice(candidates)
 
     print("\n====TWEET=====\n%s" % text)
 
