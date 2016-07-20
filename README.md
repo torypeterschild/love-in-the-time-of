@@ -10,6 +10,7 @@ love-in-the-time-of is (or will be) a Twitter bot that finds goings-on in the ne
 * [TextBlob](http://textblob.readthedocs.io/en/dev/index.html) for POS tagging, noun phrase extraction, and sentiment analysis
 * [wordfilter](https://github.com/dariusk/wordfilter) for filtering bad words 
 * [tweepy](https://github.com/tweepy/tweepy) for Tweeting
+* [pycorpora](https://github.com/aparrish/pycorpora) for extra filtering using [Darius Kazemi's Corpora Project](https://github.com/dariusk/corpora)
 
 ##License
 
