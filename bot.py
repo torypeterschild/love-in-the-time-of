@@ -1,20 +1,12 @@
-import tweepy
-import HTMLParser
-import os
-import urllib2
-import random
-from pycorpora import humans
-from pycorpora import geography
+import os, urllib2, random, tweepy, HTMLParser
+from pycorpora import humans, geography
 from bs4 import BeautifulSoup
 from time import gmtime, strftime
 from wordfilter import Wordfilter
 from offensive import tact
 from textblob import TextBlob
-from textblob.np_extractors import FastNPExtractor
-from textblob.taggers import NLTKTagger
-from secrets import *
-from textblob import Blobber
 from textblob.blob import Word
+from secrets import *
 
 
 
@@ -31,8 +23,6 @@ tweets = api.user_timeline(bot_username)
 # Global
 hparser = HTMLParser.HTMLParser()
 wordfilter = Wordfilter()
-extractor = FastNPExtractor()
-tb = Blobber(pos_tagger=NLTKTagger())
 LOFF = "Love in the Time of"
 
 
@@ -50,23 +40,23 @@ def get_news():
             headline = item.title.string
             h_split = headline.split()
 
-            # skip incomplete headlines
+            # Skip incomplete headlines
             if "..." in headline:
                 continue
 
-            # skip headlines in all caps
+            # Skip headlines in all caps
             if count_caps(h_split) >= len(h_split) - 3:
                 continue
 
-            # filter for offensive words
+            # Filter for offensive words
             if wordfilter.blacklisted(headline):
                 continue
 
-            # filter again
+            # Filter again
             if not tact(headline):
                 continue
 
-            # remove article attributions
+            # Remove article attributions
             if "-" in headline:
                 headline = headline.split("-")[:-1]
                 headline = ' '.join(headline).strip()
@@ -86,6 +76,15 @@ def contains_name(phrase):
             return True
 
 
+def ends_with_adj(phrase):
+    words = phrase.split()
+    last = Word(words[-1])
+    if last.get_synsets():
+        syns_a = last.get_synsets(pos="a")
+        if len(syns_a) >= 3:
+            return True
+
+
 def ends_with_verb(phrase):
     words = phrase.split()
     last = Word(words[-1])
@@ -94,7 +93,6 @@ def ends_with_verb(phrase):
         syns_n = last.get_synsets(pos="n")
         if len(syns_v) >= len(syns_n):
             return True
-
 
 def is_city(phrase):
     for c in geography.us_cities["cities"]:
@@ -120,52 +118,58 @@ def process(headline):
     headline = hparser.unescape(headline).strip()
     print("\nHEADLINE: %s" % headline)
 
-    blob = tb(headline)
+    blob = TextBlob(headline)
     n_phrases = blob.noun_phrases
     print("\nNOUN PHRASES:")
     print(n_phrases)
 
 
     for i, phrase in enumerate(n_phrases):
-        # skip if phrase is one short word
+        # Skip if phrase is one short word
         if len(phrase) < 4:
             continue
 
-        # skip if phrase contains 's
+        # Skip if phrase contains 's
         if "'s" in phrase:
             continue
 
-        # skip if phrase is a celebrity name
+        # Skip if phrase is a celebrity name
         if phrase.title() in humans.celebrities["celebrities"]:
             print("\nEliminating %s: CELEBRITIES" % phrase)
             continue
 
-        # skip if phrase is a British celebrity name
+        # Skip if phrase is a British celebrity name
         if phrase.title() in humans.britishActors["britishActors"]:
             print("\nEliminating %s: BRITISH ACTORS" % phrase)
             continue
 
-        # skip if phrase is name of science
+        # Skip if phrase is name of science
         if phrase.title() in humans.scientists["scientists"]:
             print("\nEliminating %s: SCIENTISTS" % phrase)
             continue
 
-        # skip is phrase contains first or last names
+        # Skip is phrase contains first or last names
         if contains_name(phrase):
             print("\nEliminating %s: CONTAINS NAME" % phrase)
             continue
 
-        # skip if the last word is probably a verb
+        # Skip if the last word is probably a verb
         if ends_with_verb(phrase):
             print("\nEliminating %s: ENDS WITH VERB" % phrase)
             continue
 
-        # skip if phrase is city name
+        # Skip if the last word is probably an adjective
+        if ends_with_adj(phrase):
+            print("\nEliminating %s: ENDS WITH ADJ" % phrase)
+            continue
+
+
+        # Skip if phrase is city name
         if is_city(phrase):
             print("\nEliminating %s: CITY" % phrase)
             continue
 
-        # skip if phrase is a country name
+        # Skip if phrase is a country name
         if is_country(phrase):
             print("\nEliminating %s: COUNTRY" % phrase)
             continue
@@ -179,8 +183,7 @@ def process(headline):
     if candidates:
         text = LOFF + " " + random.choice(candidates)
 
-    print("\n====TWEET=====\n%s" % text)
-
+    # If text is too long, don't tweet
     if len(text) > 140:
         return False
     else:
