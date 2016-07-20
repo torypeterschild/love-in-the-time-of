@@ -2,7 +2,9 @@ import tweepy
 import HTMLParser
 import os
 import urllib2
+import random
 from pycorpora import humans
+from pycorpora import geography
 from bs4 import BeautifulSoup
 from time import gmtime, strftime
 from wordfilter import Wordfilter
@@ -12,11 +14,11 @@ from textblob.np_extractors import FastNPExtractor
 from textblob.taggers import NLTKTagger
 from secrets import *
 from textblob import Blobber
+from textblob.blob import Word
 
 
 
 # Bot configuration
-
 bot_username = 'LoffInTheTimeOf'
 logfile_name = bot_username + ".log"
 
@@ -75,19 +77,6 @@ def get_news():
                 continue
 
 
-def is_adj(word_pos_tuple):
-    if 'J' in word_pos_tuple[1][0]:
-        return True
-
-
-def is_noun(word_pos_tuple):
-    if 'N' in word_pos_tuple[1][0]:
-        return True
-
-def is_proper_noun(word_pos_tuple):
-    if 'NP' in word_pos_tuple[1]:
-        return True
-
 def contains_name(phrase):
     words = phrase.split()
     for w in words:
@@ -97,17 +86,49 @@ def contains_name(phrase):
             return True
 
 
+def ends_with_verb(phrase):
+    words = phrase.split()
+    last = Word(words[-1])
+    if last.get_synsets():
+        syns_v = last.get_synsets(pos="v")
+        syns_n = last.get_synsets(pos="n")
+        if len(syns_v) >= len(syns_n):
+            return True
+
+
+def is_city(phrase):
+    for c in geography.us_cities["cities"]:
+        if phrase.title() == c["city"]:
+            return True
+    for e in geography.english_towns_cities["towns"]:
+        if phrase.title() == e:
+            return True
+    for f in geography.english_towns_cities["cities"]:
+        if phrase.title() == f:
+            return True
+
+
+def is_country(phrase):
+    for c in geography.countries["countries"]:
+        if phrase.title() == c.title():
+            return True
+
+
 def process(headline):
     text = ""
+    candidates = []
     headline = hparser.unescape(headline).strip()
+    print("\nHEADLINE: %s" % headline)
 
     blob = tb(headline)
     n_phrases = blob.noun_phrases
+    print("\nNOUN PHRASES:")
+    print(n_phrases)
 
 
     for i, phrase in enumerate(n_phrases):
         # skip if phrase is one short word
-        if len(phrase) < 3:
+        if len(phrase) < 4:
             continue
 
         # skip if phrase contains 's
@@ -116,23 +137,48 @@ def process(headline):
 
         # skip if phrase is a celebrity name
         if phrase.title() in humans.celebrities["celebrities"]:
+            print("\nEliminating %s: CELEBRITIES" % phrase)
             continue
 
         # skip if phrase is a British celebrity name
         if phrase.title() in humans.britishActors["britishActors"]:
+            print("\nEliminating %s: BRITISH ACTORS" % phrase)
             continue
 
         # skip if phrase is name of science
         if phrase.title() in humans.scientists["scientists"]:
+            print("\nEliminating %s: SCIENTISTS" % phrase)
             continue
 
         # skip is phrase contains first or last names
         if contains_name(phrase):
+            print("\nEliminating %s: CONTAINS NAME" % phrase)
             continue
 
-        if len(phrase.split()) > 1:
-            text = LOFF + " " + phrase.title()
-            print("\n====TWEET=====\n%s" % text)
+        # skip if the last word is probably a verb
+        if ends_with_verb(phrase):
+            print("\nEliminating %s: ENDS WITH VERB" % phrase)
+            continue
+
+        # skip if phrase is city name
+        if is_city(phrase):
+            print("\nEliminating %s: CITY" % phrase)
+            continue
+
+        # skip if phrase is a country name
+        if is_country(phrase):
+            print("\nEliminating %s: COUNTRY" % phrase)
+            continue
+
+        if len(phrase) > 5:
+            candidates.append(phrase.title())
+
+    print("\nCANDIDATES")
+    print(candidates)
+
+    text = LOFF + " " + random.choice(candidates)
+
+    print("\n====TWEET=====\n%s" % text)
 
     if len(text) > 140:
         return False
@@ -160,14 +206,6 @@ def count_caps(headline):
         if word[0].isupper():
             count += 1
     return count
-
-
-def is_candidate(word):
-    if (word[1] == 'NN' or word[1] == 'NNS') and word[0][0].isalpha \
-            and len(word[0]) > 1:
-        return True
-    else:
-        return False
 
 
 def log(message):
