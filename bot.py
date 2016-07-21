@@ -194,6 +194,7 @@ def process(headline):
         return False
     else:
         print("\n calling tweet()")
+        text = text.encode('utf-8').translate(None, "'\"")
         return tweet(text)
 
 
