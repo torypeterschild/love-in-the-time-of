@@ -188,6 +188,7 @@ def process(headline):
     if len(text) > 140:
         return False
     else:
+        print("\n calling tweet()")
         return tweet(text)
 
 
@@ -203,6 +204,7 @@ def tweet(text):
         log(e.message)
     else:
         log("Tweeted: " + text)
+        return True
 
 
 def count_caps(headline):
