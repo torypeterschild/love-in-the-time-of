@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os, urllib2, random, tweepy, HTMLParser
 from pycorpora import humans, geography
 from bs4 import BeautifulSoup
