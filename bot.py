@@ -25,7 +25,7 @@ hparser = HTMLParser.HTMLParser()
 wordfilter = Wordfilter()
 LOFF = "Love in the Time of"
 
-
+# Get the headlines
 def get_news():
     try:
         request = urllib2.Request(
