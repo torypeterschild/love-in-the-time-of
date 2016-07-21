@@ -14,16 +14,19 @@ from secrets import *
 bot_username = 'LoffInTheTimeOf'
 logfile_name = bot_username + ".log"
 
+
 # Twitter authentication
 auth = tweepy.OAuthHandler(C_KEY, C_SECRET)
 auth.set_access_token(A_TOKEN, A_TOKEN_SECRET)
 api = tweepy.API(auth)
 tweets = api.user_timeline(bot_username)
 
+
 # Global
 hparser = HTMLParser.HTMLParser()
 wordfilter = Wordfilter()
 LOFF = "Love in the Time of"
+
 
 # Get the headlines
 def get_news():
