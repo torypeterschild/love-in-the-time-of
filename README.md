@@ -12,6 +12,9 @@ love-in-the-time-of is a Twitter bot that finds goings-on in the news and fills 
 * [tweepy](https://github.com/tweepy/tweepy) for Tweeting
 * [pycorpora](https://github.com/aparrish/pycorpora) for extra filtering using [Darius Kazemi's Corpora Project](https://github.com/dariusk/corpora)
 
+## Acknowledgements
+Thanks to [Molly White](https://github.com/molly) for her [framework](https://github.com/molly/twitterbot_framework) and [tutorial](http://blog.mollywhite.net/twitter-bots-pt2/)
+
 ##License
 
 love-in-the-time-of is licensed under the MIT License. See LICENSE for more information.
