@@ -5,6 +5,8 @@ love-in-the-time-of
 
 love-in-the-time-of is a Twitter bot that finds goings-on in the news and fills in the blank in the title "Love in the Time of ________".
 
+[@LoffInTheTimeOf](https://twitter.com/LoffInTheTimeOf)
+
 ## Requires ##
 * [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/) for HTML parsing
 * [TextBlob](http://textblob.readthedocs.io/en/dev/index.html) for POS tagging, noun phrase extraction, and sentiment analysis
