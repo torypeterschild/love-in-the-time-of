@@ -201,7 +201,7 @@ def process(headline):
 
 def tweet(text):
     for tweet in tweets:
-        if text == tweet.text:
+        if text.lower() == tweet.text.lower():
             return False
 
     # Send the tweet and log success or failure
