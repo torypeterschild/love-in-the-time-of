@@ -1,8 +1,6 @@
 love-in-the-time-of
 ===================
 
-**Note**: love-in-the-time-of is a work in progress.
-
 love-in-the-time-of is a Twitter bot that finds goings-on in the news and fills in the blank in the title "Love in the Time of ________".
 
 [@LoffInTheTimeOf](https://twitter.com/LoffInTheTimeOf)
