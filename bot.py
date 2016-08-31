@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, urllib2, random, tweepy, HTMLParser
+import os, urllib2, random, tweepy, HTMLParser, string
 from pycorpora import humans, geography
 from bs4 import BeautifulSoup
 from time import gmtime, strftime
@@ -181,7 +181,7 @@ def process(headline):
             continue
 
         if len(phrase) > 5:
-            candidates.append(phrase.title())
+            candidates.append(string.capwords(phrase))
 
     print("\nCANDIDATES")
     print(candidates)
